@@ -1,0 +1,19 @@
+- name: Run Keycloak container
+  community.docker.docker_container:
+    name: "{{ keycloak.container_name }}"
+    image: "{{ keycloak.image }}"
+    state: started
+    restart_policy: unless-stopped
+    command: start-dev
+    env:
+      KEYCLOAK_ADMIN: "{{ keycloak.admin_user }}"
+      KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak.admin_password }}"
+      KC_DB: "{{ keycloak.env.KC_DB }}"
+      KC_DB_URL_HOST: "{{ postgres.container_name }}"
+      KC_DB_URL_DATABASE: "{{ keycloak.env.KC_DB_URL_DATABASE }}"
+      KC_DB_USERNAME: "{{ keycloak.env.KC_DB_USERNAME }}"
+      KC_DB_PASSWORD: "{{ keycloak.env.KC_DB_PASSWORD }}"
+    ports:
+      - "{{ keycloak.port }}:8080"
+    networks:
+      - name: "{{ docker_network }}"

@@ -1,0 +1,17 @@
+- name: Include cleanup tasks
+  include_tasks: clean_up.yml
+
+- name: Include Docker installation tasks
+  include_tasks: docker.yml
+
+- name: Include Postgres setup tasks
+  include_tasks: postgres.yml
+
+- name: Include Keycloak setup tasks
+  include_tasks: keycloak.yml
+
+- name: Include Nginx + OAuth2 Proxy setup
+  include_tasks: nginx.yml
+
+- name: Validate containers are running
+  include_tasks: validate.yml

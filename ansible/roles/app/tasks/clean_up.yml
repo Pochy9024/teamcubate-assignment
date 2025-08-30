@@ -1,0 +1,34 @@
+- name: Stop and remove all containers related to the app
+  community.docker.docker_container:
+    name: "{{ item }}"
+    state: absent
+    force_kill: true
+  loop:
+    - "{{ postgres.container_name }}"
+    - "{{ keycloak.container_name }}"
+    - "{{ nginx.container_name }}"
+    - "{{ oauth2_proxy.container_name }}"
+  ignore_errors: true
+
+- name: Wait until old containers are really deleted
+  ansible.builtin.command: docker ps -a --filter "name={{ item }}" --format "{{ '{{.Names}}' }}"
+  register: container_check
+  until: container_check.stdout == ""
+  retries: 5
+  delay: 2
+  loop:
+    - "{{ postgres.container_name }}"
+    - "{{ keycloak.container_name }}"
+    - "{{ nginx.container_name }}"
+    - "{{ oauth2_proxy.container_name }}"
+
+- name: Remove Docker network
+  community.docker.docker_network:
+    name: "{{ docker_network }}"
+    state: absent
+
+- name: Remove old static site directory
+  ansible.builtin.file:
+    path: /opt/app/static_site
+    state: absent
+  ignore_errors: true
