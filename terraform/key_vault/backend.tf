@@ -3,6 +3,6 @@ terraform {
     resource_group_name   = "rg-terraform-state"
     storage_account_name  = "tfstatestoragetc2025"
     container_name        = "tfstate"
-    key                   = "demo/vm.tfstate"
+    key                   = "demo/kv.tfstate"
   }
 }

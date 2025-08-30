@@ -1,3 +1,4 @@
 variable "resource_group_name" {}
 variable "location" {}
-variable "bastion_subnet_id" {}
+variable "subnet_id" {}
+variable "public_ip_name" {}

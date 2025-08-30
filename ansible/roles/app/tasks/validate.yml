@@ -1,0 +1,26 @@
+- name: Validate Postgres container is running
+  community.docker.docker_container_info:
+    name: "{{ postgres.container_name }}"
+  register: pg_info
+- name: Fail if Postgres is not running
+  ansible.builtin.fail:
+    msg: "Postgres container is not running!"
+  when: pg_info.container.State.Status != "running"
+
+- name: Validate Keycloak container is running
+  community.docker.docker_container_info:
+    name: "{{ keycloak.container_name }}"
+  register: kc_info
+- name: Fail if Keycloak is not running
+  ansible.builtin.fail:
+    msg: "Keycloak container is not running!"
+  when: kc_info.container.State.Status != "running"
+
+- name: Validate Nginx container is running
+  community.docker.docker_container_info:
+    name: "{{ nginx.container_name }}"
+  register: nginx_info
+- name: Fail if Nginx is not running
+  ansible.builtin.fail:
+    msg: "Nginx container is not running!"
+  when: nginx_info.container.State.Status != "running"

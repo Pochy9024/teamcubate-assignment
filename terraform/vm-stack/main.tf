@@ -30,4 +30,15 @@ module "vm" {
   subnet_id           = module.networking.subnet_id
   nsg_id              = module.nsg.nsg_id
   ssh_public_key      = var.ssh_public_key
+
+  depends_on = [ module.networking, module.nsg ]
+}
+
+module "bastion" {
+  source               = "../modules/bastion"
+  resource_group_name  = var.resource_group_name
+  location             = var.location
+  public_ip_name       = "bastion-pip"
+  subnet_id            = module.networking.bastion_subnet_id
+  depends_on = [ module.networking ]
 }
