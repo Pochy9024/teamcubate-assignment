@@ -1,0 +1,57 @@
+name: Destroy Infra
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which stack to destroy? (vm-stack | all)"
+        required: true
+        default: "vm-stack"
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Destroy VM Stack
+        if: ${{ github.event.inputs.target == 'vm-stack' || github.event.inputs.target == 'all' }}
+        working-directory: terraform/vm-stack
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.TF_VAR_resource_group }}" \
+            -backend-config="storage_account_name=${{ secrets.TF_VAR_storage_account }}" \
+            -backend-config="container_name=${{ secrets.TF_VAR_container_name }}" \
+            -backend-config="key=demo/vm.tfstate"
+
+          terraform destroy -auto-approve
+
+      - name: Destroy Backend
+        if: ${{ github.event.inputs.target == 'all' }}
+        working-directory: terraform/state-storage
+        run: |
+          terraform init
+          terraform destroy -auto-approve
+          
+      - name: Destroy Key Vault
+        if: ${{ github.event.inputs.target == 'all' }}
+        working-directory: terraform/key-vault
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.TF_VAR_resource_group }}" \
+            -backend-config="storage_account_name=${{ secrets.TF_VAR_storage_account }}" \
+            -backend-config="container_name=${{ secrets.TF_VAR_container_name }}" \
+            -backend-config="key=demo/kv.tfstate"
+
+          terraform destroy -auto-approve
