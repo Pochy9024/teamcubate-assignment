@@ -20,7 +20,7 @@ keycloak:
     admin_user: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'keycloak-admin-user', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
     admin_password: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'keycloak-admin-password', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
     env:
-      KC_DB: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-db', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
+      KC_DB: postgres
       KC_DB_URL_HOST: postgres
       KC_DB_URL_PORT: 5432
       KC_DB_URL_DATABASE: postgres
