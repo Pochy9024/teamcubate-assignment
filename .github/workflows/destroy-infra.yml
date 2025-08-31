@@ -2,11 +2,6 @@ name: Destroy Infra
 
 on:
   workflow_dispatch:
-    inputs:
-      target:
-        description: "Which stack to destroy? (vm-stack | all)"
-        required: true
-        default: "vm-stack"
 
 jobs:
   terraform-destroy:
@@ -41,15 +36,7 @@ jobs:
 
           terraform destroy -auto-approve
 
-      - name: Destroy Backend
-        if: ${{ github.event.inputs.target == 'all' }}
-        working-directory: terraform/state-storage
-        run: |
-          terraform init
-          terraform destroy -auto-approve
-
       - name: Destroy Key Vault
-        if: ${{ github.event.inputs.target == 'all' }}
         working-directory: terraform/key-vault
         run: |
           terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
