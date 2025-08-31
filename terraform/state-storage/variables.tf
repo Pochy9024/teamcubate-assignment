@@ -1,7 +1,6 @@
 variable "subscription_id" {
   description = "Azure subscription ID"
   type        = string
-  default     = null
 }
 
 variable "resource_group_name" {
