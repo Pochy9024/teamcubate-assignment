@@ -16,7 +16,7 @@ variable "location" {
 variable "storage_account_name" {
   type = string
   description = "The name of the storage account."
-  default = "tfstatestoragetc2025"
+  default = "tcdemotfstatesa"
 }
 
 variable "container_name" {

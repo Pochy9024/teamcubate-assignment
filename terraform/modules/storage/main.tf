@@ -1,22 +1,23 @@
-resource "azurerm_resource_group" "rg" {
+resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.location
 }
 
-resource "azurerm_storage_account" "sa" {
+resource "azurerm_storage_account" "main" {
   name                     = var.storage_account_name
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = var.location
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  public_network_access_enabled = false
+
+  blob_properties {
+    delete_retention_policy {
+      days = 30
+    }
+  }
 
   tags = {
-    environment = "dev"
+    environment = "demo"
   }
-}
-
-resource "azurerm_storage_container" "container" {
-  name                  = var.container_name
-  storage_account_id    = azurerm_storage_account.sa.id
-  container_access_type = "private"
 }
