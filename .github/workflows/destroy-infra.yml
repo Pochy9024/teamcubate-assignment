@@ -33,11 +33,10 @@ jobs:
         if: ${{ github.event.inputs.target == 'vm-stack' || github.event.inputs.target == 'all' }}
         working-directory: terraform/vm-stack
         run: |
-          terraform init \
-            -backend-config="resource_group_name=${{ secrets.TF_VAR_resource_group }}" \
-            -backend-config="storage_account_name=${{ secrets.TF_VAR_storage_account }}" \
-            -backend-config="container_name=${{ secrets.TF_VAR_container_name }}" \
-            -backend-config="key=demo/vm.tfstate"
+          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
+                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
+                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
+                         -backend-config="key=vm-stack.tfstate"
 
           terraform destroy -auto-approve
 
@@ -52,10 +51,9 @@ jobs:
         if: ${{ github.event.inputs.target == 'all' }}
         working-directory: terraform/key-vault
         run: |
-          terraform init \
-            -backend-config="resource_group_name=${{ secrets.TF_VAR_resource_group }}" \
-            -backend-config="storage_account_name=${{ secrets.TF_VAR_storage_account }}" \
-            -backend-config="container_name=${{ secrets.TF_VAR_container_name }}" \
-            -backend-config="key=demo/kv.tfstate"
+          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
+                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
+                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
+                         -backend-config="key=demo/kv.tfstate"
 
           terraform destroy -auto-approve
