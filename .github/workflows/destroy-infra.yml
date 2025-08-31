@@ -17,6 +17,7 @@ jobs:
       TF_VAR_storage_account_name: ${{ secrets.TF_STORAGE_ACCOUNT }}
       TF_VAR_container_name: ${{ secrets.TF_CONTAINER_NAME }}
       TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_ssh_public_key: ${{ secrets.AZURE_VM_PUBLIC_SSH_KEY }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
