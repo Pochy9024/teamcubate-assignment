@@ -1,0 +1,43 @@
+name: Deploy Infra
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform-infra:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Init & Apply Backend
+        working-directory: terraform/state-storage
+        run: |
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Init & Apply KeyVault
+        working-directory: terraform/key-vault
+        run: |
+          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
+                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
+                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
+                         -backend-config="key=demo/kv.tfstate"
+          terraform apply -auto-approve
+
+      - name: Init & Apply VM Stack
+        working-directory: terraform/vm-stack
+        run: |
+          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
+                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
+                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
+                         -backend-config="key=demo/vm.tfstate"
+          terraform apply -auto-approve
