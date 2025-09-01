@@ -9,8 +9,6 @@ resource "azurerm_key_vault" "kv" {
   soft_delete_retention_days   = 30
   purge_protection_enabled     = true
 
-  public_network_access_enabled = false
-
   sku_name = "standard"
 
   access_policy {
@@ -20,7 +18,14 @@ resource "azurerm_key_vault" "kv" {
     key_permissions = [
       "Get",
       "List",
-      "Update"
+      "Update",
+      "Create",
+      "Encrypt",
+      "Decrypt",
+      "WrapKey",
+      "UnwrapKey",
+      "GetRotationPolicy",
+      "SetRotationPolicy" 
     ]
 
     secret_permissions = [
@@ -32,12 +37,5 @@ resource "azurerm_key_vault" "kv" {
     storage_permissions = [
       "Get",
     ]
-  }
-
-  network_acls {
-    default_action = "Deny"
-    bypass         = "AzureServices"
-
-    ip_rules = var.whitelisted_ips
   }
 }

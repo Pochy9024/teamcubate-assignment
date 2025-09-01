@@ -9,12 +9,13 @@ variable "vm_backup_rg" {
   type        = string
 }
 
-variable "vm_backup_recovery_vault_name" {
-  description = "The name of the recovery vault for VM backups."
-  type        = string
-}
-
 variable "vm_id" {
   description = "The ID of the virtual machine to be backed up."
   type        = string
+}
+
+variable "location" {
+  description = "Azure location"
+  type        = string
+  default     = "West Europe"
 }

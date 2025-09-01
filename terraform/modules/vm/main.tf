@@ -56,8 +56,8 @@ module "vm_key_vault" {
 
   subscription_id          = var.subscription_id
   kv_name                  = var.kv_name
-  kv_resource_group_name   = var.vm_resource_group_name
-  location                 = var.location
+  kv_resource_group_name   = azurerm_resource_group.vm_rg.name
+  location                 = azurerm_resource_group.vm_rg.location
   whitelisted_ips          = var.whitelisted_ips
 }
 
@@ -107,12 +107,9 @@ module "vm_backups" {
   source = "../vm_backups"
 
   vm_id = azurerm_linux_virtual_machine.vm.id
-  vm_backup_rg = var.vm_resource_group_name
-  vm_backup_recovery_vault_name = module.vm_key_vault.key_vault_name
-
+  vm_backup_rg = azurerm_resource_group.vm_rg.name
   depends_on = [ module.vm_key_vault, azurerm_linux_virtual_machine.vm ]
 }
-
 
 module "monitor_diagnostic" {
   source              = "../monitor_diagnostic"

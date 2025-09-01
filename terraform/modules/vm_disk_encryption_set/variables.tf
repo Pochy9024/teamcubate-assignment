@@ -1,7 +1,7 @@
 variable "vm_disk_encryption_key_name" {
   description = "Name of the VM disk encryption key"
   type        = string
-  default     = "tcdemo-vm-disk-encryption-key"
+  default     = "tcdemo-vmdisk-encryption-key"
 }
 
 variable "vm_kv_id" {
