@@ -3,7 +3,7 @@ resource "azurerm_recovery_services_vault" "backup_vault" {
   location            = var.location
   resource_group_name = var.vm_backup_rg
   sku                 = "Standard"
-  soft_delete_enabled = true
+  soft_delete_enabled = false
 }
 
 resource "azurerm_backup_policy_vm" "backup_policy" {
