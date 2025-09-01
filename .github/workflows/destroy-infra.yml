@@ -26,7 +26,6 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Destroy VM Stack
-        if: ${{ github.event.inputs.target == 'vm-stack' || github.event.inputs.target == 'all' }}
         working-directory: terraform/vm-stack
         run: |
           terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
