@@ -24,12 +24,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Init & Apply Backend
-        working-directory: terraform/state-storage
-        run: |
-          terraform init
-          terraform apply -auto-approve
-
       - name: Init & Apply KeyVault
         working-directory: terraform/key-vault
         run: |
