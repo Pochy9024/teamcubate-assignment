@@ -27,17 +27,11 @@ jobs:
       - name: Init & Apply KeyVault
         working-directory: terraform/key-vault
         run: |
-          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
-                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
-                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
-                         -backend-config="key=demo/kv.tfstate"
+          terraform init
           terraform apply -auto-approve
 
       - name: Init & Apply VM Stack
         working-directory: terraform/vm-stack
         run: |
-          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
-                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
-                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
-                         -backend-config="key=demo/vm.tfstate"
+          terraform init
           terraform apply -auto-approve
