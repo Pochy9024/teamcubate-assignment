@@ -9,7 +9,13 @@ resource "azurerm_storage_account" "main" {
   location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  public_network_access_enabled = false
+  public_network_access_enabled = true
+
+  network_rules {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+    ip_rules       = var.whitelisted_ips
+  }
 
   blob_properties {
     delete_retention_policy {
@@ -20,4 +26,10 @@ resource "azurerm_storage_account" "main" {
   tags = {
     environment = "demo"
   }
+}
+
+resource "azurerm_storage_container" "tfstate" {
+  name                  = var.container_name
+  storage_account_id    = azurerm_storage_account.main.id
+  container_access_type = "private"
 }

@@ -1,18 +1,35 @@
-variable "resource_group_name" {}
-variable "location" {}
-variable "vnet_name" {}
-variable "vnet_address_space" {}
-variable "subnet_name" {}
-variable "subnet_address_space" {}
-
-variable "bastion_subnet_name" {
-  description = "The name of the Azure Bastion subnet."
+variable "location" {
   type        = string
-  default     = "AzureBastionSubnet"
+  description = "Azure location for resources"
+  default     = "West Europe"
 }
 
-variable "bastion_subnet_address_space" {
-  description = "The address space for the Azure Bastion subnet."
+variable "resource_group_name" {
   type        = string
-  default     = "10.0.2.0/27"
+  description = "Name of the resource group"
+  default     = "tcdemo-networking-rg"
+}
+
+variable "vnet_name" {
+  type        = string
+  description = "The name of the virtual network."
+  default     = "networking-vnet-demo"
+}
+
+variable "vnet_address_space" {
+  type        = list(string)
+  description = "The address space for the virtual network."
+  default     = ["10.0.0.0/16"]
+}
+
+variable "storage_account_name" {
+  type        = string
+  description = "The name of the existing storage account."
+  default     = "tcdemotfstatesa"
+}
+
+variable "storage_resource_group" {
+  type        = string
+  description = "The name of the resource group where the storage account is located."
+  default     = "tcdemo-storage-state-rg"
 }

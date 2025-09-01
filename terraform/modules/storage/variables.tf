@@ -13,6 +13,7 @@ variable "storage_account_name" {
 
 variable "container_name" {
   type = string
+  default = "tcdemo-tfstate"
 }
 
 variable "vnet_name" {
@@ -23,4 +24,9 @@ variable "vnet_name" {
 variable "subnet_name" {
   type    = string
   default = "storage-subnet-demo"
+}
+
+variable "whitelisted_ips" {
+  type    = list(string)
+  default = ["193.186.4.96", "178.148.189.147"]
 }
