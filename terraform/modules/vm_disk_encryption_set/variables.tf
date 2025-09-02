@@ -1,7 +1,7 @@
 variable "vm_disk_encryption_key_name" {
   description = "Name of the VM disk encryption key"
   type        = string
-  default     = "tcdemo-vmdisk-encryption-key"
+  default     = "tcdemo-vm-disk-${formatdate("YYMMDDHHMM", timestamp())}"
 }
 
 variable "vm_kv_id" {
