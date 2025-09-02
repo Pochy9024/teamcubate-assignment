@@ -11,6 +11,12 @@ resource "azurerm_storage_account" "main" {
   account_replication_type = "LRS"
   public_network_access_enabled = true
 
+  network_rules {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+    ip_rules       = var.whitelisted_ips
+  }
+
   blob_properties {
     delete_retention_policy {
       days = 30
