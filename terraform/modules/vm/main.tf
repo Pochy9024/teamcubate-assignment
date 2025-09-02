@@ -25,7 +25,7 @@ resource "azurerm_network_security_group" "vm_nsg" {
     priority                   = 120
     direction                  = "Inbound"
     access                     = "Allow"
-    protocol                   = "Http"
+    protocol                   = "TCP"
     source_port_range          = "*"
     destination_port_range     = "80"
     source_address_prefix      = "Internet"
