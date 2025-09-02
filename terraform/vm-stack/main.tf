@@ -1,44 +1,39 @@
 provider "azurerm" {
-  features {}
+  features {
+     resource_group {
+       prevent_deletion_if_contains_resources = false
+     }
+  }
   subscription_id = var.subscription_id
 }
 
 module "networking" {
   source               = "../modules/networking"
-  resource_group_name  = var.resource_group_name
-  location             = var.location
-  vnet_name            = var.vnet_name
-  vnet_address_space   = var.vnet_address_space
-  subnet_name          = var.subnet_name
-  subnet_address_space = var.subnet_address_space
-}
-
-module "nsg" {
-  source              = "../modules/nsg"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  nsg_name            = var.nsg_name
 }
 
 module "vm" {
   source              = "../modules/vm"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  vm_name             = var.vm_name
-  vm_size             = var.vm_size
-  admin_username      = var.admin_username
-  subnet_id           = module.networking.subnet_id
-  nsg_id              = module.nsg.nsg_id
-  ssh_public_key      = var.ssh_public_key
+  bastion_subnet_address_prefix = module.networking.bastion_subnet_address_prefix
+  vm_subnet_id = module.networking.vm_subnet_id
+  ssh_public_key = var.ssh_public_key
+  subscription_id = var.subscription_id
 
-  depends_on = [ module.networking, module.nsg ]
+  depends_on = [ module.networking ]
 }
 
 module "bastion" {
   source               = "../modules/bastion"
-  resource_group_name  = var.resource_group_name
-  location             = var.location
-  public_ip_name       = "bastion-pip"
   subnet_id            = module.networking.bastion_subnet_id
-  depends_on = [ module.networking ]
+
+  depends_on           = [ module.networking ]
 }
+
+module "load_balancer" {
+  source                = "../modules/load_balancer"
+  resource_group_name   = module.networking.resource_group_name
+  vm_nic_id             = module.vm.vm_nic_id
+  vm_nic_ip_config_name = module.vm.vm_nic_ip_config_name
+
+  depends_on = [ module.networking, module.vm ]
+}
+

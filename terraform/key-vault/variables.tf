@@ -1,21 +1,21 @@
 variable "subscription_id" {
   description = "Azure subscription ID"
   type        = string
-  default     = null
 }
 
 variable "location" {
   type    = string
-  default = "East US"
+  default = "West Europe"
 }
 
-variable "resource_group_name" {
+variable "kv_resource_group_name" {
   type        = string
-  description = "The name of the resource group."
+  description = "The name of the Key Vault resource group."
+  default     = "tcdemo-key-vault-rg"
 }
 
 variable "kv_name" {
   description = "The name of the Key Vault."
   type        = string
-  default     = "ansible-kv-demo"
+  default     = "tcdemo-ansible-kv"
 }

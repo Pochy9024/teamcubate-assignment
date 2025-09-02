@@ -25,23 +25,42 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Destroy VM Stack
-        if: ${{ github.event.inputs.target == 'vm-stack' || github.event.inputs.target == 'all' }}
-        working-directory: terraform/vm-stack
-        run: |
-          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
-                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
-                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
-                         -backend-config="key=demo/vm.tfstate"
-
-          terraform destroy -auto-approve
+      - name: Whitelist GitHub Runner IP
+        uses: azure/CLI@v1
+        with:
+            inlineScript: |
+                set -eu
+                agentIP=$(curl -s https://api.ipify.org/)
+                echo "Adding firewall rule for runner IP: $agentIP"
+                az storage account network-rule add \
+                    --resource-group "${{ secrets.TF_VAR_RESOURCE_GROUP_NAME }}" \
+                    --account-name "${{ secrets.TF_STORAGE_ACCOUNT }}" \
+                    --ip-address $agentIP
+                sleep 30
 
       - name: Destroy Key Vault
         working-directory: terraform/key-vault
         run: |
-          terraform init -backend-config="resource_group_name=${{ secrets.TF_RG_NAME }}" \
-                         -backend-config="storage_account_name=${{ secrets.TF_STORAGE_ACCOUNT }}" \
-                         -backend-config="container_name=${{ secrets.TF_CONTAINER_NAME }}" \
-                         -backend-config="key=demo/kv.tfstate"
-
+          terraform init
           terraform destroy -auto-approve
+
+      - name: Destroy VM Stack
+        working-directory: terraform/vm-stack
+        run: |
+          terraform init
+          terraform destroy -auto-approve
+
+      - name: Remove GitHub Runner IP
+        if: always()
+        uses: azure/CLI@v1
+        with:
+            inlineScript: |
+                set -eu
+                agentIP=$(curl -s https://api.ipify.org/)
+                echo "Removing firewall rule for runner IP: $agentIP"
+                az storage account network-rule remove \
+                    --resource-group "${{ secrets.TF_VAR_RESOURCE_GROUP_NAME }}" \
+                    --account-name "${{ secrets.TF_STORAGE_ACCOUNT }}" \
+                    --ip-address $agentIP
+
+      
