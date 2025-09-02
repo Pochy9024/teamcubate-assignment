@@ -20,13 +20,13 @@ resource "azurerm_key_vault" "kv" {
       "List",
       "Update",
       "Create",
+      "Delete",
       "Encrypt",
       "Decrypt",
       "WrapKey",
       "UnwrapKey",
       "GetRotationPolicy",
-      "SetRotationPolicy",
-      "Delete"
+      "SetRotationPolicy"
     ]
 
     secret_permissions = [
