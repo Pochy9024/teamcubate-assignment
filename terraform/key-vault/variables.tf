@@ -17,5 +17,5 @@ variable "kv_resource_group_name" {
 variable "kv_name" {
   description = "The name of the Key Vault."
   type        = string
-  default     = "ansible-kv-demo"
+  default     = "tcdemo-ansible-secrets-kv"
 }
