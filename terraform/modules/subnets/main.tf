@@ -29,7 +29,7 @@ resource "azurerm_network_security_group" "nsg_vm" {
     destination_address_prefix = "*"
   }
 
-    security_rule {
+  security_rule {
     name                       = "AllowHTTPFromLB"
     priority                   = 100
     direction                  = "Inbound"
@@ -38,6 +38,18 @@ resource "azurerm_network_security_group" "nsg_vm" {
     source_port_range          = "*"
     destination_port_range     = "80"
     source_address_prefix      = "AzureLoadBalancer"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "AllowHTTPInbound"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "Internet"
     destination_address_prefix = "*"
   }
 }
