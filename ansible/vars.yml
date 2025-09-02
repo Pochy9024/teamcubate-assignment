@@ -1,7 +1,3 @@
-# VM / host
-ansible_user: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'ansible-user', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-ansible_ssh_private_key_file: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'ansible-ssh-pv-key', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-
 # Docker
 docker_version: "latest"
 docker_network: "app_network"
@@ -9,23 +5,23 @@ docker_network: "app_network"
 postgres:
   image: postgres:16
   container_name: postgres
-  user: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-user', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-  password: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-password', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-  db: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-db', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
+  user: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-user', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
+  password: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-password', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
+  db: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-db', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
   port: 5432
 
 keycloak:
     image: quay.io/keycloak/keycloak:21.1.1
     container_name: keycloak
-    admin_user: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'keycloak-admin-user', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-    admin_password: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'keycloak-admin-password', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
+    admin_user: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'keycloak-admin-user', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
+    admin_password: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'keycloak-admin-password', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
     env:
       KC_DB: postgres
       KC_DB_URL_HOST: postgres
       KC_DB_URL_PORT: 5432
       KC_DB_URL_DATABASE: postgres
-      KC_DB_USERNAME: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-user', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-      KC_DB_PASSWORD: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-password', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
+      KC_DB_USERNAME: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-user', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
+      KC_DB_PASSWORD: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'postgres-password', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
       KC_HTTP_ENABLED: "true"
     port: 8080
     restart: always
@@ -39,6 +35,6 @@ oauth2_proxy:
   container_name: oauth2_proxy
   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.0
   port: 4180
-  client_id: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'oauth2-client-id', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-  client_secret: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'oauth2-client-secret', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
-  cookie_secret: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'oauth2-cookie-secret', vault_url='https://ansible-kv-demo.vault.azure.net/') }}"
+  client_id: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'oauth2-client-id', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
+  client_secret: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'oauth2-client-secret', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
+  cookie_secret: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'oauth2-cookie-secret', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
