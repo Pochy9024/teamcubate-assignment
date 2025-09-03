@@ -31,6 +31,18 @@ resource "azurerm_network_security_group" "vm_nsg" {
     source_address_prefix      = var.bastion_subnet_address_prefix
     destination_address_prefix = "*"
   }
+
+  security_rule {
+    name                       = "AllowHTTPInbound"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "Internet"
+    destination_address_prefix = "*"
+  }
 }
 
 resource "azurerm_network_interface" "nic" {

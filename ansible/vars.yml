@@ -2,6 +2,8 @@
 docker_version: "latest"
 docker_network: "app_network"
 
+vm_public_ip: "{{ lookup('azure.azcollection.azure_keyvault_secret', 'vm-lb-public-ip', vault_url='https://tcdemo-ansible-kv.vault.azure.net/') }}"
+
 postgres:
   image: postgres:16
   container_name: postgres

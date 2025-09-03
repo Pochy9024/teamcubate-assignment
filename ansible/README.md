@@ -67,6 +67,7 @@ We use an existing Azure Key Vault previously created by terraform.
 - oauth2-client-id
 - oauth2-client-secret
 - oauth2-cookie-secret
+- vm-lb-public-ip
 
 # 5. Passwordless SSH Setup
 ### Generate an SSH Key Pair

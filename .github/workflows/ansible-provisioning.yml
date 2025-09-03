@@ -7,15 +7,7 @@ jobs:
   ansible-provision:
     runs-on: ubuntu-latest
     env:
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      TF_STATE_RG: ${{ secrets.TF_STATE_RG }}
-      TF_STATE_STORAGE: ${{ secrets.TF_STATE_STORAGE }}
-      TF_STATE_CONTAINER: ${{ secrets.TF_STATE_CONTAINER }}
-      TF_WORKING_DIR: terraform/vm-stack
-      ANSIBLE_INVENTORY: inventories/hosts.yml
-      ANSIBLE_USER: azureuser   # change if needed
-      LOCAL_SSH_KEY: ${{ secrets.LOCAL_SSH_KEY_PATH }}
+        ANSIBLE_INVENTORY: "inventories/hosts.yml"
 
     steps:
       - name: Checkout repo
@@ -32,59 +24,32 @@ jobs:
           sudo apt install -y python3-pip unzip curl
           pip3 install --user azure-identity azure-keyvault-secrets ansible
 
-      - name: Install Azure CLI
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          az version
-
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Get Bastion public IP
-        id: bastion_ip
-        run: |
-          BASTION_IP=$(az network public-ip show \
-            --resource-group $RESOURCE_GROUP \
-            --name $BASTION_PUBLIC_IP_NAME \
-            --query "ipAddress" -o tsv)
-          echo "BASTION_IP=$BASTION_IP" >> $GITHUB_ENV
-          echo "Bastion IP: $BASTION_IP"
-
-      - name: Get VM private IP
-        id: vm_ip
-        run: |
-          VM_PRIVATE_IP=$(az network nic show \
-            --resource-group $RESOURCE_GROUP \
-            --name $VM_NIC_NAME \
-            --query "ipConfigurations[0].privateIpAddress" -o tsv)
-          echo "VM_PRIVATE_IP=$VM_PRIVATE_IP" >> $GITHUB_ENV
-          echo "VM Private IP: $VM_PRIVATE_IP"
-
       - name: Open Bastion tunnel
         run: |
           az network bastion tunnel \
-            --name $BASTION_NAME \
-            --resource-group $RG_NAME \
-            --target-resource-id /subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$RG_NAME/providers/Microsoft.Compute/virtualMachines/$VM_NAME \
+            --name ${{ secrets.BASTION_HOST_NAME }} \
+            --resource-group ${{ secrets.BASTION_RG_NAME }} \
+            --target-resource-id /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.VM_RG_NAME }}/providers/Microsoft.Compute/virtualMachines/${{ secrets.VM_NAME }} \
             --resource-port 22 \
             --port 10022 &
           echo "Waiting 10s for tunnel to initialize..."
           sleep 10
 
       - name: Run passwordless sudo playbook
+        working-directory: ansible/
         run: |
           ansible-playbook -i $ANSIBLE_INVENTORY passwordless-sudo-playbook.yml \
-            -l $VM_NAME \
-            -e "ansible_port=10022" \
-            -e "ansible_user=$ANSIBLE_USER" \
-            --ssh-extra-args "-i $LOCAL_SSH_KEY -o StrictHostKeyChecking=no"
+            -l vm-demo \
+            -e "ansible_port=10022"
 
       - name: Run main playbook
+        working-directory: ansible/
         run: |
           ansible-playbook -i $ANSIBLE_INVENTORY playbook.yml \
-            -l $VM_NAME \
-            -e "ansible_port=10022" \
-            -e "ansible_user=$ANSIBLE_USER" \
-            --ssh-extra-args "-i $LOCAL_SSH_KEY -o StrictHostKeyChecking=no"
+            -l vm-demo \
+            -e "ansible_port=10022"
