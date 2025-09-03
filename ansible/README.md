@@ -30,7 +30,7 @@ brew update && brew install azure-cli
 az version
 ```
 
-## 2. Azure CLI Installation
+## 2. Dependencies Installation
 The playbooks require Python >= 3.8 and the following libraries:
 	•	azure-identity
 	•	azure-keyvault-secrets
