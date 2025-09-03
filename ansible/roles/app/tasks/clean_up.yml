@@ -1,3 +1,6 @@
+- name: Check if Docker service exists
+  ansible.builtin.service_facts:
+
 - name: Stop and remove all containers related to the app
   community.docker.docker_container:
     name: "{{ item }}"
@@ -9,6 +12,7 @@
     - "{{ nginx.container_name }}"
     - "{{ oauth2_proxy.container_name }}"
   ignore_errors: true
+  when: "'docker' in ansible_facts.services"
 
 - name: Wait until old containers are really deleted
   ansible.builtin.command: docker ps -a --filter "name={{ item }}" --format "{{ '{{.Names}}' }}"
@@ -21,14 +25,17 @@
     - "{{ keycloak.container_name }}"
     - "{{ nginx.container_name }}"
     - "{{ oauth2_proxy.container_name }}"
+  when: "'docker' in ansible_facts.services"
 
 - name: Remove Docker network
   community.docker.docker_network:
     name: "{{ docker_network }}"
     state: absent
+  when: "'docker' in ansible_facts.services"
 
 - name: Remove old static site directory
   ansible.builtin.file:
     path: /opt/app/static_site
     state: absent
   ignore_errors: true
+  

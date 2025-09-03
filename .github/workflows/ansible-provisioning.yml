@@ -1,0 +1,55 @@
+name: Provision VM with Ansible
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ansible-provision:
+    runs-on: ubuntu-latest
+    env:
+        ANSIBLE_INVENTORY: "inventories/hosts.yml"
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip unzip curl
+          pip3 install --user azure-identity azure-keyvault-secrets ansible
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Open Bastion tunnel
+        run: |
+          az network bastion tunnel \
+            --name ${{ secrets.BASTION_HOST_NAME }} \
+            --resource-group ${{ secrets.BASTION_RG_NAME }} \
+            --target-resource-id /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.VM_RG_NAME }}/providers/Microsoft.Compute/virtualMachines/${{ secrets.VM_NAME }} \
+            --resource-port 22 \
+            --port 10022 &
+          echo "Waiting 10s for tunnel to initialize..."
+          sleep 10
+
+      - name: Run passwordless sudo playbook
+        working-directory: ansible/
+        run: |
+          ansible-playbook -i $ANSIBLE_INVENTORY passwordless-sudo-playbook.yml \
+            -l vm-demo \
+            -e "ansible_port=10022"
+
+      - name: Run main playbook
+        working-directory: ansible/
+        run: |
+          ansible-playbook -i $ANSIBLE_INVENTORY playbook.yml \
+            -l vm-demo \
+            -e "ansible_port=10022"

@@ -6,6 +6,7 @@
     restart_policy: unless-stopped
     command: start-dev
     env:
+      KEYCLOAK_FRONTEND_URL: "http://{{ vm_public_ip }}"
       KEYCLOAK_ADMIN: "{{ keycloak.admin_user }}"
       KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak.admin_password }}"
       KC_DB: "{{ keycloak.env.KC_DB }}"
@@ -17,3 +18,59 @@
       - "{{ keycloak.port }}:8080"
     networks:
       - name: "{{ docker_network }}"
+
+- name: Wait for Keycloak to be fully ready
+  uri:
+    url: "http://127.0.0.1:8080/realms/master"
+    method: GET
+    status_code: 200
+  register: keycloak_health
+  retries: 30
+  delay: 5
+  until: keycloak_health.status == 200
+
+- name: Get Keycloak admin token
+  uri:
+    url: "http://127.0.0.1:8080/realms/master/protocol/openid-connect/token"
+    method: POST
+    body:
+      client_id: admin-cli
+      username: "{{ keycloak.admin_user }}"
+      password: "{{ keycloak.admin_password }}"
+      grant_type: password
+    body_format: form-urlencoded
+    return_content: yes
+  register: token_response
+
+- name: Create Keycloak client
+  uri:
+    url: "http://127.0.0.1:8080/admin/realms/master/clients"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ token_response.json.access_token }}"
+    body_format: json
+    body:
+      clientId: "{{ oauth2_proxy.client_id }}"
+      enabled: true
+      publicClient: true
+      secret: "{{ oauth2_proxy.client_secret }}"
+      redirectUris:
+        - "http://{{ vm_public_ip }}/oauth2/callback"
+      protocol: "openid-connect"
+    status_code: [201, 409]
+
+- name: Create Keycloak application user
+  uri:
+    url: "http://127.0.0.1:8080/admin/realms/master/users"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ token_response.json.access_token }}"
+    body_format: json
+    body:
+      username: "test-user"
+      enabled: true
+      credentials:
+        - type: "password"
+          value: "12345678"
+          temporary: false
+    status_code: [201, 409]

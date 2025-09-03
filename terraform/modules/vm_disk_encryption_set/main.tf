@@ -1,5 +1,5 @@
 resource "azurerm_key_vault_key" "kv_key" {
-  name         = "tcdemo-vm-disk-${formatdate("YYMMDDHHMM", timestamp())}"
+  name         = "tcdemo-vm-disk-encrypt-key"
   key_vault_id = var.vm_kv_id
   key_type     = "RSA"
   key_size     = 2048

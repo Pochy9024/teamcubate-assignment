@@ -57,6 +57,7 @@ az login
 We use an existing Azure Key Vault previously created by terraform.
 ### Setup needed vars in Azure Key Vault
 - ansible-user
+- ansible_become_pass
 - ansible-ssh-pv-key
 - postgres-user
 - postgres-password
@@ -66,6 +67,7 @@ We use an existing Azure Key Vault previously created by terraform.
 - oauth2-client-id
 - oauth2-client-secret
 - oauth2-cookie-secret
+- vm-lb-public-ip
 
 # 5. Passwordless SSH Setup
 ### Generate an SSH Key Pair
@@ -92,7 +94,7 @@ az network bastion tunnel \
 ```
 ### Run passwordless playbook
 ```bash
-ansible-playbook -i inventories/hosts.yml passwordless-sudo-playbook.yml -l <vm-name> -e "ansible_port=10022"
+ansible-playbook -i inventories/hosts.yml passwordless-sudo-playbook.yml -l vm-demo -e "ansible_port=10022"
 ```
 
 # 6. Run main playbook for provisioning Azure Virtual Machine
